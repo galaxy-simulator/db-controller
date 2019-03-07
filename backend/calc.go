@@ -28,7 +28,7 @@ func CalcAllForces(database *sql.DB, star structs.Star2D, galaxyIndex int64, the
 	return force
 }
 
-// calcAllForces nodes calculates the forces in between a sta	log.Printf("Calculating the forces acting on the star %v", star)r and a node and returns the overall force
+// CalcAllForces nodes calculates the forces in between a sta	log.Printf("Calculating the forces acting on the star %v", star)r and a node and returns the overall force
 // TODO: implement the calcForce(star, centerOfMass) {...} function
 // TODO: implement the getSubtreeIDs(nodeID) []int64 {...} function
 func CalcAllForcesNode(star structs.Star2D, nodeID int64, theta float64) structs.Vec2 {
