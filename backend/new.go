@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-// newTree creates a new tree with the given width
+// NewTree creates a new tree with the given width
 func NewTree(database *sql.DB, width float64) {
 	db = database
 
@@ -31,7 +31,7 @@ func NewTree(database *sql.DB, width float64) {
 	}
 }
 
-// newNode Inserts a new node into the database with the given parameters
+// NewNode Inserts a new node into the database with the given parameters
 func newNode(x float64, y float64, width float64, depth int64, timestep int64) int64 {
 	// build the query creating a new node
 	query := fmt.Sprintf("INSERT INTO nodes (box_center, box_width, depth, isleaf, timestep) VALUES ('{%f, %f}', %f, %d, TRUE, %d) RETURNING node_id", x, y, width, depth, timestep)
