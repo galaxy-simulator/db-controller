@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-// genForestTree generates a forest representation of the tree with the given index
+// GenForestTree generates a forest representation of the tree with the given index
 func GenForestTree(database *sql.DB, index int64) string {
 	db = database
 	rootNodeID := getRootNodeID(index)
