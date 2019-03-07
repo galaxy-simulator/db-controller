@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-// deleteAll Stars deletes all the rows in the stars table
+// DeleteAll Stars deletes all the rows in the stars table
 func DeleteAllStars(database *sql.DB) {
 	db = database
 	// build the query creating a new node
@@ -20,7 +20,7 @@ func DeleteAllStars(database *sql.DB) {
 	}
 }
 
-// deleteAll Stars deletes all the rows in the nodes table
+// DeleteAll Stars deletes all the rows in the nodes table
 func DeleteAllNodes(database *sql.DB) {
 	db = database
 	// build the query creating a new node
