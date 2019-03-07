@@ -180,7 +180,7 @@ func GetStar(starID int64) structs.Star2D {
 	return star
 }
 
-// getStarIDTimestep returns the timestep the given starID is currently inside of
+// GetStarIDTimestep returns the timestep the given starID is currently inside of
 func GetStarIDTimestep(starID int64) int64 {
 	var timestep int64
 
@@ -222,7 +222,7 @@ func getNodeTotalMass(nodeID int64) float64 {
 	return mass
 }
 
-// getListOfStarsGo returns the list of stars in go struct format
+// GetListOfStarsGo returns the list of stars in go struct format
 func GetListOfStarsGo(database *sql.DB) []structs.Star2D {
 	db = database
 	// build the query
@@ -323,7 +323,7 @@ func GetListOfStarIDsTimestep(db *sql.DB, timestep int64) []int64 {
 	return starIDList
 }
 
-// getListOfStarsCsv returns an array of strings containing the coordinates of all the stars in the stars table
+// GetListOfStarsCsv returns an array of strings containing the coordinates of all the stars in the stars table
 func GetListOfStarsCsv(db *sql.DB) []string {
 	// build the query
 	query := fmt.Sprintf("SELECT * FROM stars")
@@ -354,7 +354,7 @@ func GetListOfStarsCsv(db *sql.DB) []string {
 	return starList
 }
 
-// getListOfStarsTreeCsv returns an array of strings containing the coordinates of all the stars in the given tree
+// GetListOfStarsTreeCsv returns an array of strings containing the coordinates of all the stars in the given tree
 func GetListOfStarsTree(database *sql.DB, treeindex int64) []structs.Star2D {
 	db = database
 
