@@ -9,14 +9,20 @@ import (
 func InitStarsTable(db *sql.DB) {
 	query := `CREATE TABLE public.stars
 (
-    star_id bigint NOT NULL DEFAULT nextval('stars_star_id_seq'::regclass),
-    x numeric,
-    y numeric,
-    vx numeric,
-    vy numeric,
-    m numeric
+  star_id bigserial,
+  x numeric,
+  y numeric,
+  vx numeric,
+  vy numeric,
+  m numeric,
+  PRIMARY KEY (star_id)
 )
-`
+  WITH (
+    OIDS = FALSE
+  );
+
+ALTER TABLE public.stars
+  OWNER to postgres;`
 	_, err := db.Exec(query)
 	if err != nil {
 		log.Fatalf("[ E ] InitNodesTable query: %v \n\t\t\tquery: %s\n", err, query)
@@ -25,21 +31,31 @@ func InitStarsTable(db *sql.DB) {
 
 // InitNodesTable initialises the nodes table
 func InitNodesTable(db *sql.DB) {
+	log.Println("creating the query")
 	query := `CREATE TABLE public.nodes
-	(
-		node_id bigint NOT NULL DEFAULT nextval('nodes_node_id_seq'::regclass),
-	box_width numeric NOT NULL,
-		total_mass numeric NOT NULL,
-		depth integer,
-		star_id bigint NOT NULL,
-		root_id bigint NOT NULL,
-		isleaf boolean,
-		box_center numeric[] NOT NULL,
-		center_of_mass numeric[] NOT NULL,
-		subnodes bigint[] NOT NULL
-	)
-`
+(
+  node_id bigserial NOT NULL,
+  box_width numeric,
+  total_mass numeric,
+  depth integer,
+  star_id bigint,
+  root_id bigint,
+  isleaf boolean,
+  box_center numeric[],
+  center_of_mass numeric[],
+  subnodes bigint[],
+  PRIMARY KEY (node_id)
+)
+  WITH (
+    OIDS = FALSE
+  );
+
+ALTER TABLE public.nodes
+  OWNER to postgres;`
+	log.Println("done creating the query")
+	log.Println("executing the query")
 	_, err := db.Exec(query)
+	log.Println("done executing the query")
 	if err != nil {
 		log.Fatalf("[ E ] InitNodesTable query: %v \n\t\t\tquery: %s\n", err, query)
 	}
