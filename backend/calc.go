@@ -81,57 +81,6 @@ func CalcAllForcesNode(star structs.Star2D, nodeID int64, theta float64) structs
 
 	}
 
-	//// dont't recurse deeper into the tree
-	//if localTheta < theta {
-	//	log.Printf("localTheta < theta")
-	//	var force structs.Vec2
-	//
-	//	// if the nodeID is not zero, use the center of mass as the other star
-	//	if nodeID != 0 {
-	//		pseudoStarCoodinates := getCenterOfMass(nodeID)
-	//		PseudoStar := structs.Star2D{
-	//			C: structs.Vec2{
-	//				X: pseudoStarCoodinates.X,
-	//				Y: pseudoStarCoodinates.Y,
-	//			},
-	//			V: structs.Vec2{
-	//				X: 0,
-	//				Y: 0,
-	//			},
-	//			M: 1000,
-	//		}
-	//		log.Printf("PseudoStar: %v", PseudoStar)
-	//		force = calcForce(star, PseudoStar)
-	//
-	//		// else, use the star in the node as the other star
-	//	} else {
-	//		if getStarID(nodeID) != 0 {
-	//			var pseudoStar = GetStar(getStarID(nodeID))
-	//			force = calcForce(star, pseudoStar)
-	//		}
-	//	}
-	//
-	//	forceX = force.X
-	//	forceY = force.X
-	//
-	//// recurse deeper into the tree
-	//} else {
-	//	log.Printf("localTheta > theta")
-	//	// iterate over all subtrees and add the forces acting through them
-	//	var subtreeIDs [4]int64
-	//	subtreeIDs = getSubtreeIDs(nodeID)
-	//	for i, subtreeID := range subtreeIDs {
-	//		fmt.Printf("Subtree: %d", i)
-	//
-	//		// don't recurse into
-	//		if subtreeID != 0 {
-	//			var force = CalcAllForcesNode(star, subtreeID, theta)
-	//			log.Printf("force: %v", force)
-	//			forceX += force.X
-	//			forceY += force.Y
-	//		}
-	//	}
-	//}
 	log.Println("---------------------------------------")
 	return structs.Vec2{forceX, forceY}
 }
