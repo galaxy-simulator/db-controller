@@ -7,7 +7,8 @@ import (
 
 // InitStarsTable initialises the stars table
 func InitStarsTable(db *sql.DB) {
-	query := `CREATE TABLE public.stars
+	log.Println("Preparing the query")
+	var query = `CREATE TABLE IF NOT EXISTS public.stars
 (
   star_id bigserial,
   x numeric,
@@ -16,23 +17,24 @@ func InitStarsTable(db *sql.DB) {
   vy numeric,
   m numeric,
   PRIMARY KEY (star_id)
-)
-  WITH (
-    OIDS = FALSE
-  );
+) WITH (
+  OIDS = FALSE
+);
 
 ALTER TABLE public.stars
   OWNER to postgres;`
+	log.Println("Executing the query")
 	_, err := db.Exec(query)
 	if err != nil {
 		log.Fatalf("[ E ] InitNodesTable query: %v \n\t\t\tquery: %s\n", err, query)
 	}
+	log.Println("DONE")
 }
 
 // InitNodesTable initialises the nodes table
 func InitNodesTable(db *sql.DB) {
 	log.Println("creating the query")
-	query := `CREATE TABLE public.nodes
+	var query = `CREATE TABLE IF NOT EXISTS public.nodes
 (
   node_id bigserial NOT NULL,
   box_width numeric,
@@ -45,10 +47,9 @@ func InitNodesTable(db *sql.DB) {
   center_of_mass numeric[],
   subnodes bigint[],
   PRIMARY KEY (node_id)
-)
-  WITH (
-    OIDS = FALSE
-  );
+) WITH (
+  OIDS = FALSE
+);
 
 ALTER TABLE public.nodes
   OWNER to postgres;`
