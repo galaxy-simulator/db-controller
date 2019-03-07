@@ -5,6 +5,7 @@ import (
 	"log"
 )
 
+// InitStarsTable initialises the stars table
 func InitStarsTable(db *sql.DB) {
 	query := `CREATE TABLE public.stars
 (
@@ -22,6 +23,7 @@ func InitStarsTable(db *sql.DB) {
 	}
 }
 
+// InitNodesTable initialises the nodes table
 func InitNodesTable(db *sql.DB) {
 	query := `CREATE TABLE public.nodes
 	(
