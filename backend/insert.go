@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-// insertStar inserts the given star into the stars table and the nodes table tree
+// InsertStar inserts the given star into the stars table and the nodes table tree
 func InsertStar(database *sql.DB, star structs.Star2D, index int64) int64 {
 	db = database
 	start := time.Now()
@@ -168,7 +168,7 @@ func directInsert(starID int64, nodeID int64) {
 	}
 }
 
-// insertList inserts all the stars in the given .csv into the stars and nodes table
+// InsertList inserts all the stars in the given .csv into the stars and nodes table
 func InsertList(database *sql.DB, filename string) {
 	db = database
 	// open the file
