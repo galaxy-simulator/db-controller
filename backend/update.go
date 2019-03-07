@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-// updateTotalMass gets a tree index and returns the nodeID of the trees root node
+// UpdateTotalMass gets a tree index and returns the nodeID of the trees root node
 func UpdateTotalMass(database *sql.DB, index int64) {
 	db = database
 	rootNodeID := getRootNodeID(index)
@@ -62,7 +62,7 @@ func updateTotalMassNode(nodeID int64) float64 {
 	return totalmass
 }
 
-// updateCenterOfMass recursively updates the center of mass of all the nodes starting at the node with the given
+// UpdateCenterOfMass recursively updates the center of mass of all the nodes starting at the node with the given
 // root index
 func UpdateCenterOfMass(database *sql.DB, index int64) {
 	db = database
