@@ -18,30 +18,36 @@ func InsertStar(database *sql.DB, star structs.Star2D, index int64) int64 {
 	db = database
 	start := time.Now()
 
-	log.Printf("Inserting the star %v into the tree with the index %d", star, index)
-
 	// insert the star into the stars table
+	log.Printf("Inserting the star %v into the tree with the index %d", star, index)
 	starID := insertIntoStars(star)
 
 	// get the root node id
+	log.Println("[ ] Getting the root node ID")
 	query := fmt.Sprintf("select case when exists (select node_id from nodes where root_id=%d) then (select node_id from nodes where root_id=%d) else -1 end;", index, index)
 	var id int64
 	err := db.QueryRow(query).Scan(&id)
+	log.Println("[ ] Done getting the root node ID")
 
 	// if there are no rows in the result set, create a new tree
 	if err != nil {
 		log.Fatalf("[ E ] Get root node id query: %v\n\t\t\t query: %s\n", err, query)
 	}
 
+	// if there is no tree to insert the star into, create one
 	if id == -1 {
+		log.Println("[ ] No tree to insert the star into... ...creating one")
 		NewTree(db, 1000)
 		id = getRootNodeID(index)
 	}
 
-	log.Printf("Node id of the root node %d: %d", id, index)
+	// print the node ID of the root of the tree into which the star is going to be inserted into
+	log.Printf("[ ] Node id of the root node %d: %d", id, index)
 
 	// insert the star into the tree (using it's ID) starting at the root
+	log.Printf("[ ] Inserting the star into the tree starting at the root")
 	insertIntoTree(starID, id)
+	log.Printf("[ ] Done inserting the star into the tree")
 	elapsedTime := time.Since(start)
 	log.Printf("\t\t\t\t\t %s", elapsedTime)
 	return starID
@@ -89,18 +95,26 @@ func insertIntoTree(starID int64, nodeID int64) {
 	// get the node with the given nodeID
 	// find out if the node contains a star or not
 	containsStar := containsStar(nodeID)
+	if containsStar == true {
+		log.Printf("[i] The node allready contains a star")
+	}
 
 	// find out if the node is a leaf
 	isLeaf := isLeaf(nodeID)
+	if isLeaf == true {
+		log.Printf("[i] The node is a leaf")
+	}
 
 	// if the node is a leaf and contains a star
 	// subdivide the tree
 	// insert the preexisting star into the correct subtree
 	// insert the new star into the subtree
 	if isLeaf == true && containsStar == true {
-		//log.Printf("Case 1, \t %v \t %v", nodeWidth, nodeCenter)
+		log.Printf("[ ] Case 1: the node is a leaf and contains a star")
+		log.Printf("[ ]         1. Subdividing the node")
+		log.Printf("[ ]         2. Shifting the blocking star away")
+		log.Printf("[ ]         2. Inserting the star into the node")
 		subdivide(nodeID)
-		//tree := printTree(nodeID)
 
 		// Stage 1: Inserting the blocking star
 		blockingStarID := getStarID(nodeID)                               // get the id of the star blocking the node
@@ -120,7 +134,8 @@ func insertIntoTree(starID int64, nodeID int64) {
 	// if the node is a leaf and does not contain a star
 	// insert the star into the node and subdivide it
 	if isLeaf == true && containsStar == false {
-		//log.Printf("Case 2, \t %v \t %v", nodeWidth, nodeCenter)
+		log.Printf("[ ] Case 2: the node is a leaf and does not contain a star")
+		log.Printf("[ ]         1. Directly inserting the star")
 		directInsert(starID, nodeID)
 	}
 
@@ -128,7 +143,10 @@ func insertIntoTree(starID int64, nodeID int64) {
 	// insert the preexisting star into the correct subtree
 	// insert the new star into the subtree
 	if isLeaf == false && containsStar == true {
-		//log.Printf("Case 3, \t %v \t %v", nodeWidth, nodeCenter)
+		log.Printf("[ ] Case 3: the node is not a leaf and contains a star")
+		log.Printf("[ ]         1. Shifting the blocking star away")
+		log.Printf("[ ]         2. Inserting the star into the correcy subnode")
+
 		// Stage 1: Inserting the blocking star
 		blockingStarID := getStarID(nodeID)                               // get the id of the star blocking the node
 		blockingStar := GetStar(blockingStarID)                           // get the actual star
@@ -147,6 +165,9 @@ func insertIntoTree(starID int64, nodeID int64) {
 	// if the node is not a leaf and does not contain a star
 	// insert the new star into the according subtree
 	if isLeaf == false && containsStar == false {
+		log.Printf("[ ] Case 4: The node is not a leaf and does not contain a star")
+		log.Printf("[ ]         1. Insert the star into the correct subnode")
+
 		//log.Printf("Case 4, \t %v \t %v", nodeWidth, nodeCenter)
 		star := GetStar(starID)                                   // get the actual star
 		starQuadrant := quadrant(star, nodeID)                    // find out in which quadrant it belongs
