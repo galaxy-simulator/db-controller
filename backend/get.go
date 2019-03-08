@@ -400,16 +400,15 @@ func GetListOfStarsTree(database *sql.DB, treeindex int64) []structs.Star2D {
 
 // getRootNodeID gets a tree index and returns the nodeID of its root node
 func getRootNodeID(index int64) int64 {
+	log.Printf("Getting the rootnodeid of the tree with the index %d", index)
 	var nodeID int64
 
-	log.Printf("Preparing query with the root id %d", index)
 	query := fmt.Sprintf("SELECT node_id FROM nodes WHERE root_id=%d", index)
-	log.Printf("Sending query")
 	err := db.QueryRow(query).Scan(&nodeID)
 	if err != nil {
 		log.Fatalf("[ E ] getRootNodeID query: %v\n\t\t\t query: %s\n", err, query)
 	}
-	log.Printf("Done Sending query")
+	log.Printf("Node id of tree with the index %d: %d", index, nodeID)
 
 	return nodeID
 }
