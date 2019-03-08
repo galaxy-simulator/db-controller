@@ -21,10 +21,24 @@ import (
 
 var (
 	db *sql.DB
+
+	// database
+	DBURL         string = "postgres.docker.localhost"
+	DBUSER        string = "postgres"
+	DBPASSWD      string = ""
+	DBPORT        int64  = 5432
+	DBPROJECTNAME string = "postgres"
+
+	// local http api
+	port string
+
+	starIdBufferChannel       = make(chan int64, 100000000)
+	currentTimestep     int64 = 1
 )
 
 func requestInfo(r *http.Request) {
-	log.Printf("%s %s %s", r.Method, r.Host, r.URL.Path)
+	infoString := fmt.Sprintf("%s %s %s", r.Method, r.Host, r.URL.Path)
+	log.Println(infoString)
 }
 
 func errHandler(name string, err error) {
@@ -33,102 +47,14 @@ func errHandler(name string, err error) {
 	}
 }
 
-func indexHandler(w http.ResponseWriter, r *http.Request) {
-	requestInfo(r)
-	indexString := `<html><body><h1>Galaxy Simulator Database Frontend</h1>
-
-		API:
-	<h3> / (GET) </h3>
-
-	<h3> /new (POST) </h3>
-		Create a new Tree
-	<br>
-		Parameters:
-	<ul>
-	<li>
-		w float64: width of the tree
-	</li>
-	</ul>
-
-	<h3> /deleteStars (POST) </h3>
-		Delete all stars from the stars Table
-	<br>
-		Parameters:
-	<ul>
-	<li>
-		none
-	</li>
-	</ul>
-
-	<h3> /deleteNodes (POST) </h3>
-		Delete all nodes from the nodes Table
-	<br>
-		Parameters:
-	<ul>
-	<li>
-		none
-	</li>
-	</ul>
-
-	<h3> /starslist/go (GET) </h3>
-		List all stars using go-array format
-	<br>
-		Parameters:
-	<ul>
-	<li>
-		none
-	</li>
-	</ul>
-
-	<h3> /starslist/csv (GET) </h3>
-		List all stars as a csv
-	<br>
-		Parameters:
-	<ul>
-	<li>
-		none
-	</li>
-	</ul>
-
-	<h3> /updatetotalmass (POST) </h3>
-		Update the total mass of all the nodes in the tree with the given index
-	<br>
-		Parameters:
-	<ul>
-	<li>
-		index int: index of the tree
-	</li>
-	</ul>
-
-	<h3> /updatecenterofmass (POST) </h3>
-		Update the center of mass of all the nodes in the tree with the given index
-	<br>
-		Parameters:
-	<ul>
-	<li>
-		index int: index of the tree
-	</li>
-	</ul>
-
-	<h3> /genforesttree (GET) </h3>
-		Generate the forest representation of the tree with the given index
-	<br>
-		Parameters:
-	<ul>
-	<li>
-		index int: index of the tree
-	</li>
-	</ul>
-
-	</body>
-	</html>
-`
-	_, _ = fmt.Fprintf(w, "%s", indexString)
-}
 func newTreeHandler(w http.ResponseWriter, r *http.Request) {
 	requestInfo(r)
 
+	parseFormErr := r.ParseForm()
+	errHandler("parseFormErr", parseFormErr)
+
 	width, _ := strconv.ParseFloat(r.Form.Get("w"), 64)
+	log.Printf("[newTree] width: %f", width)
 	backend.NewTree(db, width)
 }
 
@@ -269,13 +195,13 @@ func insertStarListHandler(w http.ResponseWriter, r *http.Request) {
 	for {
 
 		// read the line
-		line, error := reader.Read()
+		line, err := reader.Read()
 
 		// handler errors such as broken syntax and the end of the file
-		if error == io.EOF {
+		if err == io.EOF {
 			break
-		} else if error != nil {
-			log.Fatal(error)
+		} else if err != nil {
+			log.Fatal(err)
 		}
 
 		// parse the star parameters
@@ -302,19 +228,65 @@ func insertStarListHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func main() {
+func distributorHandler(w http.ResponseWriter, r *http.Request) {
+	requestInfo(r)
+
+	// if the starIdBufferChannel is empty, fill it
+	if len(starIdBufferChannel) == 0 {
+		log.Printf("[distributor] Filling the star buffer channel (len=%d)", len(starIdBufferChannel))
+
+		// get a list of all stars in the current timestep
+		listOfStarIDs := backend.GetListOfStarIDsTimestep(db, currentTimestep)
+		log.Printf("ListOfStarIDs: %v", listOfStarIDs)
+		log.Printf("len(ListOfStarIDs): %d", len(listOfStarIDs))
+
+		// iterate over all the stars inserting them into the starIdBufferChannel
+		for index, _ := range listOfStarIDs {
+			log.Printf("ID: %d", listOfStarIDs[index])
+			starIdBufferChannel <- listOfStarIDs[index]
+		}
+		log.Println("[distributor] Done filling the star buffer channel")
+	}
+
+	// fetch a starID from the starIdBufferChannel and write it to the ResponseWriter
+	starID := <-starIdBufferChannel
+	log.Printf("[distributor] distributed starID %d", starID)
+	_, _ = fmt.Fprintf(w, "%d", starID)
+}
+
+func getFlags() {
 	// get the port on which the service should be hosted and the url of the database
-	var port string
 	flag.StringVar(&port, "port", "8080", "port used to host the service")
 	flag.Parse()
 	log.Println("[ ] Done loading the flags")
+}
 
+func getEnvironmentVariables() {
 	// get the data that should be used to connect to the database
-	var DBURL = os.Getenv("DBURL")
-	var DBUSER = os.Getenv("DBUSER")
-	var DBPASSWD = os.Getenv("DBPASSWD")
-	var DBPORT, _ = strconv.ParseInt(os.Getenv("DBPORT"), 10, 64)
-	var DBPROJECTNAME = os.Getenv("DBPROJECTNAME")
+	DBURL = os.Getenv("DBURL")
+	if DBURL == "" {
+		DBURL = "postgresql.docker.localhost"
+	}
+
+	DBUSER = os.Getenv("DBUSER")
+	if DBUSER == "" {
+		DBUSER = "postgres"
+	}
+
+	DBPASSWD = os.Getenv("DBPASSWD")
+	if DBPASSWD == "" {
+		DBPASSWD = ""
+	}
+
+	DBPORT, _ := strconv.ParseInt(os.Getenv("DBPORT"), 10, 64)
+	if DBPORT == 0 {
+		DBPORT = 5432
+	}
+
+	DBPROJECTNAME = os.Getenv("DBPROJECTNAME")
+	if DBPROJECTNAME == "" {
+		DBPROJECTNAME = "postgres"
+	}
 
 	log.Printf("DBURL: %s", DBURL)
 	log.Printf("DBUSER: %s", DBUSER)
@@ -322,11 +294,14 @@ func main() {
 	log.Printf("DBPORT: %d", DBPORT)
 	log.Printf("DBPROJECTNAME: %s", DBPROJECTNAME)
 	log.Printf("frontend port: %s", port)
+}
 
+func connectToDB() {
 	// connect to the database
 	connStr := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		DBURL, DBPORT, DBUSER, DBPASSWD, DBPROJECTNAME)
+	log.Printf("connStr: %s", connStr)
 
 	var err error
 	db, err = sql.Open("postgres", connStr)
@@ -334,20 +309,28 @@ func main() {
 		log.Fatalf("Error: The data source arguments are not valid: %s", err)
 	}
 	log.Println("[ ] Done Connecting to the DB")
+}
 
+func pingDB() {
 	// ping the db
-	err = db.Ping()
+	err := db.Ping()
 	if err != nil {
 		panic(err)
 	}
-
 	log.Println("[ ] Done Pinging the DB")
+}
+
+func main() {
+	// init
+	getFlags()
+	getEnvironmentVariables()
+	connectToDB()
+	pingDB()
 
 	// define a new mux router
 	router := mux.NewRouter()
 
 	// define the endpoints
-	router.HandleFunc("/", indexHandler).Methods("GET")
 	router.HandleFunc("/newTree", newTreeHandler).Methods("POST")
 	router.HandleFunc("/deleteStars", deleteStarsHandler).Methods("POST")
 	router.HandleFunc("/deleteNodes", deleteNodesHandler).Methods("POST")
@@ -360,6 +343,9 @@ func main() {
 	router.HandleFunc("/createStarsTable", createStarsTableHandler).Methods("POST")
 	router.HandleFunc("/insertStar", insertStarHandler).Methods("POST")
 	router.HandleFunc("/insertStarList", insertStarListHandler).Methods("POST")
+	router.HandleFunc("/distributor", distributorHandler).Methods("GET")
+
+	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./frontend/")))
 
 	log.Printf("[ ] Starting the API on localhost:%s", port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), router))
