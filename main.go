@@ -210,6 +210,12 @@ func insertStarHandler(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
+	log.Printf("x: %s", r.PostFormValue("x"))
+	log.Printf("y: %s", r.PostFormValue("y"))
+	log.Printf("vx: %s", r.PostFormValue("vx"))
+	log.Printf("vy: %s", r.PostFormValue("vy"))
+	log.Printf("m: %s", r.PostFormValue("m"))
+
 	// parse the star parameters
 	x, xParseErr := strconv.ParseFloat(r.PostFormValue("x"), 64)
 	errHandler("parse x", xParseErr)
