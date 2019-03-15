@@ -1,3 +1,5 @@
+git.darknebu.la/GalaxySimulator/db-controller v0.0.0-20190308175834-ef0beb88ead8 h1:Kpe8icv6XTVgEticAypvSCg2AZxVImgOPr+do6gXyQo=
+git.darknebu.la/GalaxySimulator/db-controller v0.0.0-20190308175834-ef0beb88ead8/go.mod h1:s+OTtdPBBKtwB9EYdCJCaacEtV0T+by05bNRGJOL+s4=
 git.darknebu.la/GalaxySimulator/structs v0.0.0-20190205205735-9dd56b9448e5 h1:aEQHEERwdLfRJrXb867wZzRMs1ym+j0zDys3opLWPew=
 git.darknebu.la/GalaxySimulator/structs v0.0.0-20190205205735-9dd56b9448e5/go.mod h1:LSDIBBC7IcWERm4wlDAroMpsUP7zJ1yDZFlQnP/UIsQ=
 github.com/gorilla/mux v1.7.0 h1:tOSd0UKHQd6urX6ApfOn4XdBMY6Sh1MfxV3kmaazO+U=
