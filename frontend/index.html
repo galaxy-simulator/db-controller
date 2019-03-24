@@ -11,7 +11,7 @@
     <title>Galaxy Simulator</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
     <link href="css/small-business.css" rel="stylesheet">
@@ -20,7 +20,7 @@
         function newTree() {
             var w = document.getElementById("w").value;
 
-            var url = "http://localhost:8081/newTree";
+            var url = "http://localhost:8080/newTree";
             var params = "w=" + w;
             console.log(params)
             var xhr = new XMLHttpRequest();
@@ -29,7 +29,7 @@
             xhr.send(params);
         }
         function deleteAllStars() {
-            var url = "http://localhost:8081/deleteStars";
+            var url = "http://localhost:8080/deleteStars";
             var params = "";
             var xhr = new XMLHttpRequest();
             xhr.open("POST", url, true);
@@ -37,7 +37,7 @@
             xhr.send(params);
         }
         function deleteAllNodes() {
-            var url = "http://localhost:8081/deleteNodes";
+            var url = "http://localhost:8080/deleteNodes";
             var params = "";
             var xhr = new XMLHttpRequest();
             xhr.open("POST", url, true);
@@ -45,7 +45,7 @@
             xhr.send(params);
         }
         function updateTotalMass() {
-            var url = "http://localhost:8081/updateTotalMass";
+            var url = "http://localhost:8080/updateTotalMass";
             var params = "index=1";
             var xhr = new XMLHttpRequest();
             xhr.open("POST", url, true);
@@ -53,7 +53,7 @@
             xhr.send(params);
         }
         function updateCenterOfMass() {
-            var url = "http://localhost:8081/updateCenterOfMass";
+            var url = "http://localhost:8080/updateCenterOfMass";
             var params = "index=1";
             var xhr = new XMLHttpRequest();
             xhr.open("POST", url, true);
@@ -61,7 +61,7 @@
             xhr.send(params);
         }
         function generateForest() {
-            var url = "http://localhost:8081/genForestTree";
+            var url = "http://localhost:8080/genForestTree";
             var params = "";
             var xhr = new XMLHttpRequest();
             xhr.open("GET", url, true);
@@ -76,7 +76,7 @@
             var m = document.getElementById("m").value;
             var index = document.getElementById("index").value;
 
-            var url = "http://localhost:8081/insertStar";
+            var url = "http://localhost:8080/insertStar";
             var params = "x=" + x + "&y=" + y + "&vx=" + vx + "&vy=" + vy + "&m=" + m + "&index=" + index;
             console.log(params)
             var xhr = new XMLHttpRequest();
@@ -85,7 +85,7 @@
             xhr.send(params);
         }
         function insertList() {
-            var url = "http://localhost:8081/insertList";
+            var url = "http://localhost:8080/insertList";
             var params = "";
             var xhr = new XMLHttpRequest();
             xhr.open("GET", url, true);
@@ -129,7 +129,7 @@
         <div class="col-md-3 mb-4">
             <div class="bg-dark card h-100">
                 <div class="card-body">
-                    <form action="http://localhost:8081/newTree" method="post" id="insertform">
+                    <form action="http://localhost:8080/newTree" method="post" id="insertform">
                         <h2 class="card-title text-light">New tree</h2>
                         <p class="card-text text-light">Create a new tree</p>
 
@@ -220,7 +220,7 @@
         <div class="col-md-3 mb-4">
             <div class="bg-dark card h-100">
                 <div class="card-body">
-                    <form action="http://localhost:8081/insertStar" method="post" id="insertform">
+                    <form action="http://localhost:8080/insertStar" method="post" id="insertform">
                         <h2 class="card-title text-light">Insert star</h2>
                         <p class="card-text text-light">Insert a single star into the tree</p>
 
